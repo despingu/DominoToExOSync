@@ -12,6 +12,10 @@ function New-LogMsg {
         [parameter(Mandatory = $true, Position = 0)][string]$msg,
         [parameter(Mandatory = $true, Position = 1)][ValidateSet('Info', 'Error', 'Warning')][string]$level
     )
+    
+    if (-not (Test-Path $LogPath)) {
+        New-Item $LogPath -ItemType Directory
+    }
 
     $logFilePath = Join-Path -Path $LogPath -ChildPath $_LogFileName
     $msgToLog = "[$(Get-Date -Format "yyyy-MM-dd HH-mm-ss")] [$level] [$msg]"

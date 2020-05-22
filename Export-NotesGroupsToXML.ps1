@@ -12,6 +12,10 @@ function New-LogMsg {
         [parameter(Mandatory = $true, Position = 1)][ValidateSet('Info', 'Error', 'Warning')][string]$level
     )
 
+    if (-not (Test-Path $LogPath)) {
+        New-Item $LogPath -ItemType Directory
+    }
+
     $logFilePath = Join-Path -Path $LogPath -ChildPath $_LogFileName
     $msgToLog = "[$(Get-Date -Format "yyyy-MM-dd HH-mm-ss")] [$level] [$msg]"
     Out-File -FilePath $logFilePath -Encoding utf8 -InputObject $msgToLog -Append -Force
@@ -85,7 +89,6 @@ $xmlDocument.AppendChild($xmlDocument.CreateXmlDeclaration("1.0", "UTF-8", $null
 $initComment = @"
 
 Notes Group export
-Company: C&A Services GmbH & Co. OHG
 Author: David Espin, Marc Jonas
 Script Date: 04/2020
 Generated: $(Get-Date)
