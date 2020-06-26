@@ -3,6 +3,7 @@ param(
     [parameter(Mandatory = $true, Position = 1)][ValidateNotNullOrEmpty()][string]$Database,
     [parameter(Mandatory = $true, Position = 2)][ValidateNotNullOrEmpty()][string]$XmlFilePath,
     [parameter(Mandatory = $true, Position = 3)][ValidateNotNullOrEmpty()][string]$LogPath,
+    [parameter(Mandatory = $false)][string]$NotesPW = "",
     [parameter(Mandatory = $false)][switch]$LogToScreen
 )
 
@@ -11,13 +12,13 @@ function New-LogMsg {
         [parameter(Mandatory = $true, Position = 0)][string]$msg,
         [parameter(Mandatory = $true, Position = 1)][ValidateSet('Info', 'Error', 'Warning')][string]$level
     )
-
+    
     if (-not (Test-Path $LogPath)) {
         New-Item $LogPath -ItemType Directory
     }
 
     $logFilePath = Join-Path -Path $LogPath -ChildPath $_LogFileName
-    $msgToLog = "[$(Get-Date -Format "yyyy-MM-dd HH-mm-ss")] [$level] [$msg]"
+    $msgToLog = "[$(Get-Date -Format "yyyy-MM-dd HH-mm-ss")]`t[$level]`t[$msg]"
     Out-File -FilePath $logFilePath -Encoding utf8 -InputObject $msgToLog -Append -Force
     If ($LogToScreen) {
         Switch ($level) {
@@ -119,7 +120,7 @@ $groupDocument = $null
 
 try {
     $notesSession = New-Object -ComObject Lotus.NotesSession #open the Notes Session
-    $notesSession.Initialize("") #if no password is provided, Notes will ask for the password
+    $notesSession.Initialize($NotesPW) #if no password is provided, Notes will ask for the password
     $notesAdressbook = $notesSession.GetDatabase($DominoServer, $Database, 0)
 }
 catch {
